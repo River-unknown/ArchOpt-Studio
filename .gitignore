@@ -1,0 +1,17 @@
+# Python cache files
+__pycache__/
+*.pyc
+
+# Compiled C executables
+*.out
+*.exe
+
+# Generated image outputs in project folders
+# This ensures your source code is saved, but not the generated charts
+projects/**/*.png
+projects/**/*.jpg
+
+# IDE / OS files
+.vscode/
+.idea/
+*.DS_Store
