@@ -16,6 +16,8 @@ The goal of Sprint 1 is to create a core pipeline that can:
 ArchOpt-VP/
 ├── memory.h
 ├── benchmark_cmp.h
+├── benchmark.h
+├── power.h
 ├── .gitignore
 ├── README.md
 │
@@ -26,9 +28,14 @@ ArchOpt-VP/
 │   └── main.py           # (Sprint 1) Runs the pipeline for one file
 │
 └── projects/
+    ├── DecisionTree/
+    │   ├── AoS.c
+    │   ├── Reordered.c
+    │   └── SoA.c
     └── RandomForest/
         ├── AoS.c         # (Example input file)
         ├── SoA.c
+        ├── Reordered.c
         └── AoS_performance.png # (Example output chart)
 
 ### How to Run (Sprint 1)
