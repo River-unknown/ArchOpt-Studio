@@ -26,39 +26,42 @@ This document tracks our progress.
     * Upgrade the tool to profile an entire project folder (AoS, SoA, etc.).
     * Generate summary tables and *grouped bar charts* that visually compare all implementations side-by-side.
 
-* [ ] **Sprint 3: Interactive UI Shell (Next)**
-    * Wrap the Python tool in a simple Streamlit web interface.
+* [ ] **Sprint 3: Interactive UI Shell (In Progress)**
+    * Wrap the Python tool in a simple Streamlit web interface (`src/app.py`).
     * Allow users to select a project and run the analysis from their browser.
 
-### Folder Structure
+## Folder Structure
 
+```text
 ArchOpt-VP/
-├── memory.h
-├── benchmark_cmp.h
-├── benchmark.h
-├── power.h
 ├── .gitignore
 ├── README.md
+├── benchmark.h
+├── benchmark_cmp.h
+├── memory.h
+├── power.h
 │
 ├── src/
-│   ├── run_sim.py 
-│   ├── profile.py        #Comparative engine & table generator
-│   ├── parser.py         # Parses the console output
-│   ├── visualizer.py     # Generates charts with Matplotlib
-│   └── main.py           # main file runner
+│   ├── app.py            # (Sprint 3) Streamlit Web Application
+│   ├── main.py           # (Sprint 1) Single-file runner
+│   ├── parser.py         # Output parser
+│   ├── profile.py        # (Sprint 2) Comparative engine & table generator
+│   ├── run_sim.py        # Simulation runner
+│   └── visualizer.py     # Chart generator (Single & Comparative)
 │
 └── projects/
     ├── DecisionTree/
     │   ├── AoS.c
     │   ├── Reordered.c
     │   └── SoA.c
+    │
     └── RandomForest/
         ├── AoS.c         # (Example input file)
-        ├── SoA.c
         ├── Reordered.c
-        └──Generated Charts...
-
-### ## Usage Guide
+        ├── SoA.c
+        └── (Generated Charts...)
+```
+## Usage Guide
 
 This prototype requires Python 3, `gcc` (with math library support), and `matplotlib`.
 
@@ -68,11 +71,12 @@ This is the main feature. It analyzes all `.c` files in a specific project folde
 
 **Command:**
 ```bash
-    python src/profile.py projects/RandomForest
+python src/profile.py projects/RandomForest
 ```
+**Expected Console Output:**
+The tool will run simulations silently and present a clean summary table:
 
-**Expected Console Output:** The tool will run simulations silently and present a clean summary table:
-
+```text
 === Profiling Project: RandomForest ===
 Running simulations, please wait...
   > Processing AoS... [Done]
@@ -89,30 +93,26 @@ SoA             | 172.93          | 670        | 1.5
 
 Generating charts in projects/RandomForest...
 Done! Charts generated successfully.
-
-### Generated Visuals:
-
+**Generated Visuals:**
 The script saves three comparison charts in the project folder:
-
-- RandomForest_cpu_cycles_m_comparison.png
-- RandomForest_cache_misses_comparison.png
-- RandomForest_energy_1e13_nj_comparison.png
+* `RandomForest_cpu_cycles_m_comparison.png`
+* `RandomForest_cache_misses_comparison.png`
+* `RandomForest_energy_1e13_nj_comparison.png`
 
 These charts allow you to instantly see the "AoS Anomaly" (lower cycles despite higher misses).
+```
 
-### 2. Run Single-File Analysis (Sprint 1)  
+### 2. Run Single-File Analysis (Sprint 1)
 
 If you only want to check one specific implementation:
 
- **Command:**
-
+**Command:**
 ```bash
-    python src/main.py projects/RandomForest/AoS.c
+python src/main.py projects/RandomForest/AoS.c
 ```
- **Output:**
-
-* Parses metrics to console.
-* Generates `AoS_performance.png`.
+**Output:**
+Parses metrics to console.
+Generates `AoS_performance.png`.
 
 ## Future Plans
 
