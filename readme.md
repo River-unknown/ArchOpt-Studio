@@ -1,65 +1,64 @@
 # ArchOpt-VP: Architectural Optimizer - Visual Profiler
 
-This project is a prototype tool to analyze and visualize the complex architectural power-performance of C-based Machine Learning algorithms.
+**ArchOpt-VP** is a research-grade tool designed to analyze, visualize, and optimize the architectural power-performance interactions of C-based Machine Learning algorithms.
 
-## The Core Problem: The "AoS Anomaly"
+It serves as both a **diagnostic profiler** (detecting hardware anomalies) and a **refactoring assistant** (automating Data-Oriented Design).
 
-The conventional wisdom in performance engineering is that "fewer cache misses = faster code."
+---
 
-Our research (based on the "Architectural Power-Performance Analysis for AI/ML Algorithms" report) found this is **not always true** for modern ML algorithms. We discovered a non-obvious "AoS Anomaly":
+## 🧠 Core Research: The Three Architectural Profiles
 
-* For algorithms with high randomness (like a true Random Forest), a "naive" **Array-of-Structs (AoS)** data layout can be significantly **faster** and more **energy-efficient** than a cache-optimized **Struct-of-Arrays (SoA)** layout.
-* This occurs *despite* the AoS layout having *more* L1/L2 cache misses.
-* **Hypothesis:** This is due to a complex, non-obvious interaction between the algorithm's random memory access patterns and the CPU's hardware prefetcher. The prefetcher can predict the simple AoS strides, effectively hiding the latency of its misses, but fails to predict the chaotic access patterns of the "optimized" SoA layout.
+Conventional wisdom suggests that "fewer cache misses = faster code." Our research proves this is **not always true** for modern ML workloads.
 
-This tool is being built to help developers, students, and researchers *find* and *visualize* this counter-intuitive trade-off, preventing them from making "obvious" optimizations that actually slow down their code.
+This tool diagnoses three distinct performance behaviors:
 
-## Project Status & Roadmap
+### 1. Standard Cache Optimization (e.g., Decision Tree)
+* **Behavior:** The **SoA (Struct-of-Arrays)** layout is significantly faster.
+* **Reason:** SoA improves spatial locality, directly reducing L1/L2 cache misses.
+* **Verdict:** ✅ **Use SoA.**
 
-This document tracks our progress.
+### 2. The "AoS Anomaly" (e.g., Random Forest)
+* **Behavior:** The naive **AoS (Array-of-Structs)** layout is **faster**, despite having *more* cache misses.
+* **Reason:** Hardware Prefetcher Interaction. The CPU prefetcher can predict the linear strides of AoS but fails on the chaotic access patterns of SoA in stochastic algorithms.
+* **Verdict:** ⚠️ **Stick with AoS.**
 
-* [x] **Sprint 1: Single-File Analyzer (Complete)**
-    * Build the core pipeline to compile, run, and parse the output of a *single* C file.
-    * Generate a basic bar chart of the results.
+### 3. Memory Traffic Optimization (e.g., KNN)
+* **Behavior:** SoA is faster, even though cache misses are **identical** to AoS.
+* **Reason:** Bandwidth Reduction. SoA reduces the total *volume* of data transferred from main memory, optimizing bus traffic rather than latency.
+* **Verdict:** ✅ **Use SoA.**
 
-* [x] **Sprint 2: Comparative Engine (Complete)**
-    * Upgrade the tool to profile an entire project folder (AoS, SoA, etc.).
-    * Generate summary tables and *grouped bar charts* that visually compare all implementations side-by-side.
+---
 
-* [ ] **Sprint 3: Interactive UI Shell (In Progress)**
-    * Wrap the Python tool in a simple Streamlit web interface (`src/app.py`).
-    * Allow users to select a project and run the analysis from their browser.
+## 🚀 Features
 
-## Folder Structure
+### 🔍 1. Comparative Profiling Engine
+* **Automated Simulation:** Compiles and runs C benchmarks using a hardware simulator (`memory.h`).
+* **Diagnostic Engine:** Automatically classifies performance results into one of the three research profiles above.
+* **Visualization Matrix:** Generates side-by-side charts for **CPU Cycles**, **Cache Misses**, and **Energy Consumption**.
+* **Sci-Fi Dashboard:** A modern, dark-mode UI for clear data visualization.
+
+### 💻 2. Refactoring Playground
+* **Automated Translation:** A Regex-based engine that converts legacy Object-Oriented C structs (AoS) into Data-Oriented SoA layouts.
+* **Memory Allocator Generation:** Automatically writes the C boilerplate code for allocating and freeing SoA structures.
+
+---
+
+## 📂 Folder Structure
 
 ```text
 ArchOpt-VP/
-├── .gitignore
-├── README.md
-├── benchmark.h
-├── benchmark_cmp.h
-├── memory.h
-├── power.h
-│
+├── memory.h              # Hardware Simulator Header
 ├── src/
-│   ├── app.py            # (Sprint 3) Streamlit Web Application
-│   ├── main.py           # (Sprint 1) Single-file runner
-│   ├── parser.py         # Output parser
-│   ├── profile.py        # (Sprint 2) Comparative engine & table generator
-│   ├── run_sim.py        # Simulation runner
-│   └── visualizer.py     # Chart generator (Single & Comparative)
+│   ├── app.py            # Main Streamlit Web Application
+│   ├── profile.py        # Comparative Logic Engine
+│   ├── run_sim.py        # Subprocess Simulation Runner
+│   ├── parser.py         # Regex Output Parser
+│   └── visualizer.py     # Matplotlib Chart Generator
 │
 └── projects/
-    ├── DecisionTree/
-    │   ├── AoS.c
-    │   ├── Reordered.c
-    │   └── SoA.c
-    │
-    └── RandomForest/
-        ├── AoS.c         # (Example input file)
-        ├── Reordered.c
-        ├── SoA.c
-        └── (Generated Charts...)
+    ├── DecisionTree/     # [Profile 1] Deterministic Access
+    ├── RandomForest/     # [Profile 2] Stochastic Access (AoS Anomaly)
+    └── KNN/              # [Profile 3] Traffic Optimization
 ```
 ## Usage Guide
 
@@ -90,38 +89,13 @@ AoS             | 169.79          | 836        | 1.5
 Reordered       | 192.32          | 685        | 1.7       
 SoA             | 172.93          | 670        | 1.5       
 =================================================================
-
-Generating charts in projects/RandomForest...
-Done! Charts generated successfully.
-**Generated Visuals:**
-The script saves three comparison charts in the project folder:
-* `RandomForest_cpu_cycles_m_comparison.png`
-* `RandomForest_cache_misses_comparison.png`
-* `RandomForest_energy_1e13_nj_comparison.png`
-
-These charts allow you to instantly see the "AoS Anomaly" (lower cycles despite higher misses).
 ```
-
-### 2. Run Single-File Analysis (Sprint 1)
-
-If you only want to check one specific implementation:
-
-**Command:**
-```bash
-python src/main.py projects/RandomForest/AoS.c
-```
-**Output:**
-Parses metrics to console.
-Generates `AoS_performance.png`.
 
 ## Future Plans
 
-### Sprint 3: Interactive UI
+### Sprint 4: Advanced Optimization (Future Work)
 
-* **Goal:** Make the tool accessible to non-developers.
-* **Action:** We will use `Streamlit` to build a simple web application (`app.py`).
-* **Result:** A user will be able to:
-    1.  Open the app in their browser.
-    2.  Select a project (e.g., "RandomForest") from a dropdown menu.
-    3.  Click a "Run Profile" button.
-    4.  See the comparative charts and a table of the results directly on the web page.
+* **Hardware Prefetcher Modeling:** Investigate the exact behavior of the hardware prefetcher that causes the "AoS Anomaly" in Random Forests.
+* **Broader Algorithm Support:** Extend the tool to support other memory-intensive algorithms like Support Vector Machines (SVMs) and Neural Networks.
+* **Cache Parameter Tuning:** Allow users to configure cache size, block size, and associativity within the simulation to find the optimal hardware configuration for their specific algorithm.
+* **Alternative Architectures:** Explore the impact of data layouts on emerging architectures like Processing-In-Memory (PIM).
