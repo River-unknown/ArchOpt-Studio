@@ -13,30 +13,30 @@ The goal of Sprint 1 is to create a core pipeline that can:
 
 ### Folder Structure
 
-ArchOpt-VP/
-├── memory.h
-├── benchmark_cmp.h
-├── benchmark.h
-├── power.h
-├── .gitignore
-├── README.md
-│
-├── src/
-│   ├── run_sim.py        # Compiles & runs the C code
-│   ├── parser.py         # Parses the console output
-│   ├── visualizer.py     # Generates charts with Matplotlib
-│   └── main.py           # (Sprint 1) Runs the pipeline for one file
-│
-└── projects/
-    ├── DecisionTree/
-    │   ├── AoS.c
-    │   ├── Reordered.c
-    │   └── SoA.c
-    └── RandomForest/
-        ├── AoS.c         # (Example input file)
-        ├── SoA.c
-        ├── Reordered.c
-        └── AoS_performance.png # (Example output chart)
+ArchOpt-VP/\
+├── memory.h\
+├── benchmark_cmp.h\
+├── benchmark.h\
+├── power.h\
+├── .gitignore\
+├── README.md\
+│\
+├── src/\
+│   ├── run_sim.py        # Compiles & runs the C code \
+│   ├── parser.py        # Parses the console output \
+│   ├── visualizer.py     # Generates charts with Matplotlib \
+│   └── main.py          # (Sprint 1) Runs the pipeline for one file \
+│\
+└── projects/\
+    ├── DecisionTree/\
+    │   ├── AoS.c\
+    │   ├── Reordered.c\
+    │   └── SoA.c\
+    └── RandomForest/\
+        ├── AoS.c      # (Example input file) \
+        ├── SoA.c\
+        ├── Reordered.c\
+        └── AoS_performance.png # (Example output chart) 
 
 ### How to Run (Sprint 1)
 
