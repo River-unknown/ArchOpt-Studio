@@ -1,16 +1,15 @@
 import re
 
 def parse_output(raw_text):
-    metrics = {
-        "cpu_cycles_m": None,
-        "cache_misses": None,
-        "energy_1e13_nj": None
-    }
+    # Initialize empty; let app.py handle defaults
+    metrics = {}
 
     # Regex patterns
     cpu_pattern = r"CPU clock cycles required:\s*([\d\.]+)"
     misses_pattern = r"L1-DCACHE misses=([\d\.]+)"
-    energy_pattern = r"Total energy \(in nJ\):\s+([\d\.]+)e\+013"
+    
+    # Updated: Captures "2.1e+011" OR "1.7e+013" generically
+    energy_pattern = r"Total energy \(in nJ\):\s+([\d\.]+e\+\d+)"
 
     # Find matches
     cpu_match = re.search(cpu_pattern, raw_text)
@@ -26,7 +25,8 @@ def parse_output(raw_text):
         metrics["cache_misses"] = int(misses_match.group(1))
         
     if energy_match:
-        metrics["energy_1e13_nj"] = float(energy_match.group(1))
+        raw_energy = float(energy_match.group(1))
+        # Normalize to 1e13 scale for readability in charts
+        metrics["energy_1e13_nj"] = round(raw_energy / 1e13, 3)
 
-    # print(f"--- Parsed Metrics --- \n{metrics}") <-- Silenced
     return metrics
